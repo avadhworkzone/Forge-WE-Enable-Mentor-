@@ -7,7 +7,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>
-	<string>HR Dock</string>
+	<string>Forge WE-Enable (Mentor)</string>
 	<key>CFBundleExecutable</key>
 	<string>$(EXECUTABLE_NAME)</string>
 	<key>CFBundleIdentifier</key>
@@ -15,7 +15,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>HR Dock</string>
+	<string>Forge WE-Enable (Mentor)</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
@@ -32,15 +32,7 @@
 		<true/>
 	</dict>
 	<key>NSAppleMusicUsageDescription</key>
-	<string>HR Dock requires Access to Usage Description.</string>
-	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
-	<string>HR Dock requires location access for attendance</string>
-	<key>NSLocationAlwaysUsageDescription</key>
-	<string>HR Dock requires location access for attendance.</string>
-	<key>NSLocationUsageDescription</key>
-	<string>HR Dock requires location access for attendance.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>HR Dock requires location access for attendance.</string>
+	<string>Forge WE-Enable (Mentor) requires Access to Usage Description.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

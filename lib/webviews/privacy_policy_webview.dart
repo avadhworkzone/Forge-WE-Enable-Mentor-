@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:forge_hrms/utils/color_utils.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:permission_handler/permission_handler.dart';
+// import 'package:permission_handler/permission_handler.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 class PrivacyPolicyWebViewScreen extends StatefulWidget {
   const PrivacyPolicyWebViewScreen({super.key});
 
-
   @override
-  State<PrivacyPolicyWebViewScreen> createState() => _PrivacyPolicyWebViewScreenState();
+  State<PrivacyPolicyWebViewScreen> createState() =>
+      _PrivacyPolicyWebViewScreenState();
 }
 
-class _PrivacyPolicyWebViewScreenState extends State<PrivacyPolicyWebViewScreen> {
+class _PrivacyPolicyWebViewScreenState
+    extends State<PrivacyPolicyWebViewScreen> {
   late final WebViewController controller;
   bool _isLoadingPage = true;
 
@@ -35,7 +36,8 @@ class _PrivacyPolicyWebViewScreenState extends State<PrivacyPolicyWebViewScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Material(color: AppColors.white,
+    return Material(
+      color: AppColors.white,
       child: Stack(
         children: [
           WebViewWidget(

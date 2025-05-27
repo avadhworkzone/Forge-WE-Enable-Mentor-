@@ -9,7 +9,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(useMaterial3: false),
       // title: 'Forge Hrms',
-      title: 'HR Dock',
+      title: 'Forge WE-Enable (Mentor)',
       // theme: ThemeData(
       //   primarySwatch: Colors.blue,
       // ),

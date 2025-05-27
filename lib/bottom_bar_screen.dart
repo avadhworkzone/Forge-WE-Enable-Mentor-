@@ -36,9 +36,9 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
       case 3:
         return "Privacy Policy";
       case 4:
-        return "HR Dock";
+        return "WE-Enable";
       default:
-        return "HR Dock";
+        return "WE-Enable";
     }
   }
 
@@ -61,20 +61,22 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
         ),
         centerTitle: true,
         backgroundColor: AppColors.white,
-        leading:currentBottomBarIndex!=4? InkWell(
-          onTap: () {
-            if (currentBottomBarIndex != 4) {
-              setState(() {
-                currentBottomBarIndex = 4;
-              });
-            }
-          },
-          child: Icon(
-            Icons.arrow_back_ios_new,
-            color: AppColors.primary,
-            size: 16,
-          ),
-        ):const SizedBox(),
+        leading: currentBottomBarIndex != 4
+            ? InkWell(
+                onTap: () {
+                  if (currentBottomBarIndex != 4) {
+                    setState(() {
+                      currentBottomBarIndex = 4;
+                    });
+                  }
+                },
+                child: Icon(
+                  Icons.arrow_back_ios_new,
+                  color: AppColors.primary,
+                  size: 16,
+                ),
+              )
+            : const SizedBox(),
         // shape: const RoundedRectangleBorder(
         //   borderRadius: BorderRadius.only(
         //     bottomLeft: Radius.circular(20.0),

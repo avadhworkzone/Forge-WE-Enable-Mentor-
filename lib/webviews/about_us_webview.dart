@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:forge_hrms/utils/color_utils.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:permission_handler/permission_handler.dart';
+// import 'package:permission_handler/permission_handler.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 class AboutUsWebViewScreen extends StatefulWidget {
   const AboutUsWebViewScreen({super.key});
-
 
   @override
   State<AboutUsWebViewScreen> createState() => _AboutUsWebViewScreenState();
@@ -35,7 +34,8 @@ class _AboutUsWebViewScreenState extends State<AboutUsWebViewScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(color: AppColors.white,
+    return Material(
+      color: AppColors.white,
       child: Stack(
         children: [
           WebViewWidget(

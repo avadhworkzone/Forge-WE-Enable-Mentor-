@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:forge_hrms/utils/color_utils.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:permission_handler/permission_handler.dart';
+// import 'package:permission_handler/permission_handler.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 class TermAndConditionWebViewScreen extends StatefulWidget {
@@ -36,12 +36,12 @@ class _TermAndConditionWebViewScreenState
 
   @override
   Widget build(BuildContext context) {
-    return Material(color: AppColors.white,
+    return Material(
+      color: AppColors.white,
       child: Stack(
         children: [
           WebViewWidget(
             controller: controller,
-
           ),
           // if (_isLoadingPage)
           //   const Center(

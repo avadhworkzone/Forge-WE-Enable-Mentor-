@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:forge_hrms/utils/color_utils.dart';
 import 'package:forge_hrms/utils/const_utils.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:permission_handler/permission_handler.dart';
+// import 'package:permission_handler/permission_handler.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 class HomeWebViewScreen extends StatefulWidget {
@@ -16,16 +16,23 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
   WebViewController controller = WebViewController();
   bool _isLoadingPage = true;
 
-
+  // String buildUrlWithQueryParams() {
+  //   final Uri url = Uri(
+  //       scheme: 'https',
+  //       host: 'hrms.forgealumnus.com',
+  //       path: '/employee/attendance',
+  //       queryParameters: {
+  //         'lat': '${ConstUtils.lat}',
+  //         'lng': '${ConstUtils.long}',
+  //       });
+  //   return url.toString();
+  // }
   String buildUrlWithQueryParams() {
     final Uri url = Uri(
-        scheme: 'https',
-        host: 'hrms.forgealumnus.com',
-        path: '/employee/attendance',
-        queryParameters: {
-          'lat': '${ConstUtils.lat}',
-          'lng': '${ConstUtils.long}',
-        });
+      scheme: 'https',
+      host: 'forgealumnus.com',
+      path: 'WE-enable/mentor/login',
+    );
     return url.toString();
   }
 
@@ -63,22 +70,22 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
     );
     controller.loadRequest(Uri.parse(buildUrlWithQueryParams().toString()));
 
-    final platformController = controller.platform;
-    if (platformController is AndroidWebViewController) {
-      platformController.setGeolocationPermissionsPromptCallbacks(
-        onShowPrompt: (request) async {
-          // request location permission
-          final locationPermissionStatus =
-              await Permission.locationWhenInUse.request();
-
-          // return the response
-          return GeolocationPermissionsResponse(
-            allow: locationPermissionStatus == PermissionStatus.granted,
-            retain: false,
-          );
-        },
-      );
-    }
+    // final platformController = controller.platform;
+    // if (platformController is AndroidWebViewController) {
+    //   platformController.setGeolocationPermissionsPromptCallbacks(
+    //     onShowPrompt: (request) async {
+    //       // request location permission
+    //       final locationPermissionStatus =
+    //           await Permission.locationWhenInUse.request();
+    //
+    //       // return the response
+    //       return GeolocationPermissionsResponse(
+    //         allow: locationPermissionStatus == PermissionStatus.granted,
+    //         retain: false,
+    //       );
+    //     },
+    //   );
+    // }
   }
 
   @override

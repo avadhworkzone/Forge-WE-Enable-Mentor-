@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:forge_hrms/bottom_bar_screen.dart';
 import 'package:forge_hrms/utils/const_utils.dart';
-import 'package:location/location.dart';
-import 'package:permission_handler/permission_handler.dart';
+// import 'package:location/location.dart';
+// import 'package:permission_handler/permission_handler.dart';
 import 'package:video_player/video_player.dart';
 import 'dart:async';
 import 'webviews/home_webview.dart';
 
 class SplashScreen extends StatefulWidget {
+  const SplashScreen({super.key});
+
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }
@@ -19,23 +21,24 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
     // _initializeVideoPlayer();
-    _requestLocationPermission();
+    _navigateToNextScreen();
+    // _requestLocationPermission();
   }
 
-  void _initializeVideoPlayer() {
-    _controller = VideoPlayerController.asset('assets/video/forge_intro.mp4')
-      ..initialize().then((_) {
-        setState(() {});
-        _controller.play();
-      });
-  }
+  // void _initializeVideoPlayer() {
+  //   _controller = VideoPlayerController.asset('assets/video/forge_intro.mp4')
+  //     ..initialize().then((_) {
+  //       setState(() {});
+  //       _controller.play();
+  //     });
+  // }
 
   Future<void> _navigateToNextScreen() async {
     try {
       await Future.delayed(const Duration(seconds: 3));
-      final getLocation = await Location().getLocation();
-      ConstUtils.lat = getLocation.latitude!;
-      ConstUtils.long = getLocation.longitude!;
+      // final getLocation = await Location().getLocation();
+      // ConstUtils.lat = getLocation.latitude!;
+      // ConstUtils.long = getLocation.longitude!;
       Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (context) => const BottomNavigationBarScreen(),
       ));
@@ -44,35 +47,35 @@ class _SplashScreenState extends State<SplashScreen> {
     }
   }
 
-  Future<void> _requestLocationPermission() async {
-    try {
-      Location location = Location();
-      final status = await Permission.location.request();
-      print("_checkLocationPermission:==> $status");
-
-      if (status.isGranted) {
-        final service = await Permission.location.serviceStatus;
-        print("service==> $service");
-        if (service == ServiceStatus.enabled) {
-          _navigateToNextScreen();
-        } else {
-          final isServiceEnable = await location.requestService();
-          print("isServiceEnable=====> $isServiceEnable");
-          if (isServiceEnable) {
-            _navigateToNextScreen();
-          } else {
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                content: Text("Please enable location service")));
-          }
-        }
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Please enable location permission")));
-      }
-    } on Exception catch (e) {
-      print("LOCATION ERROR :=> $e");
-    }
-  }
+  // Future<void> _requestLocationPermission() async {
+  //   try {
+  //     Location location = Location();
+  //     final status = await Permission.location.request();
+  //     print("_checkLocationPermission:==> $status");
+  //
+  //     if (status.isGranted) {
+  //       final service = await Permission.location.serviceStatus;
+  //       print("service==> $service");
+  //       if (service == ServiceStatus.enabled) {
+  //         _navigateToNextScreen();
+  //       } else {
+  //         final isServiceEnable = await location.requestService();
+  //         print("isServiceEnable=====> $isServiceEnable");
+  //         if (isServiceEnable) {
+  //           _navigateToNextScreen();
+  //         } else {
+  //           ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+  //               content: Text("Please enable location service")));
+  //         }
+  //       }
+  //     } else {
+  //       ScaffoldMessenger.of(context).showSnackBar(
+  //           const SnackBar(content: Text("Please enable location permission")));
+  //     }
+  //   } on Exception catch (e) {
+  //     print("LOCATION ERROR :=> $e");
+  //   }
+  // }
 
   @override
   void dispose() {
@@ -85,7 +88,7 @@ class _SplashScreenState extends State<SplashScreen> {
     final size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: Colors.white,
-    /*  body: _controller.value.isInitialized
+      /*  body: _controller.value.isInitialized
           ? SizedBox(
               height: size.height,
               width: size.width,
@@ -100,8 +103,14 @@ class _SplashScreenState extends State<SplashScreen> {
             )
           : const SizedBox(),*/
       body: Center(
-        child: Image.asset("assets/images/app_logo_with_bg.png",scale: 6,),
-      ),
+          child: Image.network(
+        'https://forgealumnus.com/weEnable/images/logo.png',
+        scale: 3,
+      ) /*Image.asset(
+          "assets/images/app_logo_with_bg.png",
+          scale: 6,
+        ),*/
+          ),
     );
   }
 }
