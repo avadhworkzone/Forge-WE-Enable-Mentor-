@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class AppColors{
-  static final primary=Color(0XFF023363);
-  static final scaffoldBg=Color(0XFFf2f5f7);
-  static final black=Colors.black;
-  static final grey=Colors.grey;
-  static final white=Colors.white;
-  static final yellow=Colors.yellow;
+class AppColors {
+  static const primary = Color(0XFF023363);
+  static const scaffoldBg = Color(0XFFf2f5f7);
+  static const black = Colors.black;
+  static const grey = Colors.grey;
+  static const white = Colors.white;
+  static const yellow = Colors.yellow;
 }
