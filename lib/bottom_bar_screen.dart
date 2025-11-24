@@ -288,30 +288,47 @@ class BottomNavigationBarScreen extends StatelessWidget {
             if (showSwitch)
               Padding(
                 padding: const EdgeInsets.only(right: 10),
-                child: FlutterSwitch(
-                  width: 60.0,
-                  height: 28.0,
-                  valueFontSize: 12.0,
-                  toggleSize: 20.0,
-                  value: homeController.isSwitchOn.value,
-                  borderRadius: 30.0,
-                  padding: 5.0,
-                  activeText: "OFF",
-                  inactiveText: "ON",
-                  showOnOff: true,
-                  activeColor: Colors.grey.shade300,
-                  inactiveTextColor: AppColors.white,
-                  inactiveColor: AppColors.primary,
-                  onToggle: (val) async {
-                    homeController.isSwitchOn.value = val;
-                    homeController.isLoadingPage.value = true;
-                    await SecureStorageUtils.setBool(
-                      SecureStorageUtils.isProgramSwitchOnKey,
-                      val,
-                    );
-                    print(
-                        "----homeController.isSwitchOn.value----${homeController.isSwitchOn.value}");
-                  },
+                child: Column(
+                  children: [
+                    const Text(
+                        "Forge Alumnus",
+                        /*text: storageService.readStringData(
+                                            AppStorageKeys.programName),*/
+                        style: TextStyle(
+                            color: AppColors.primary,
+                            fontSize:
+                             13.0,
+                            fontWeight: FontWeight.w700)),
+                    const SizedBox(
+                      height: 3,
+                    ),
+                    FlutterSwitch(
+                      width: 60.0,
+                      height: 28.0,
+                      valueFontSize: 12.0,
+                      toggleSize: 20.0,
+                      value: homeController.isSwitchOn.value,
+                      borderRadius: 30.0,
+                      padding: 5.0,
+                      activeText: "ON",
+                      inactiveText: "OFF",
+                      showOnOff: true,
+                      activeColor:AppColors.primary ,
+                      inactiveTextColor: AppColors.black,
+                      inactiveColor: Colors.grey.shade300,
+                      activeTextColor: Colors.white,
+                      onToggle: (val) async {
+                        homeController.isSwitchOn.value = val;
+                        homeController.isLoadingPage.value = true;
+                        await SecureStorageUtils.setBool(
+                          SecureStorageUtils.isProgramSwitchOnKey,
+                          val,
+                        );
+                        print(
+                            "----homeController.isSwitchOn.value----${homeController.isSwitchOn.value}");
+                      },
+                    ),
+                  ],
                 ),
               ),
           ],
