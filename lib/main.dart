@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       theme: ThemeData(useMaterial3: false),
       // title: 'Forge Hrms',
-      title: 'FAR',
+      title: 'Forge Resources',
       // theme: ThemeData(
       //   primarySwatch: Colors.blue,
       // ),

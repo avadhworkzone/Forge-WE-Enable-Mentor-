@@ -41,6 +41,9 @@ dependencies:
   webview_flutter: ^4.9.0
   webview_flutter_android: ^3.15.0
   flutter_switch: ^0.3.2
+  http: ^1.4.0
+  file_picker: ^10.3.7
+  webview_flutter_wkwebview: ^3.23.4
 
 #  shared_preferences: ^2.5.3
   flutter_secure_storage: ^9.2.4

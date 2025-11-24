@@ -4,9 +4,9 @@ import 'package:forge_hrms/utils/color_utils.dart';
 import 'package:forge_hrms/utils/const_utils.dart';
 import 'package:get/get.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-
-// import 'package:permission_handler/permission_handler.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
+import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
+import 'package:file_picker/file_picker.dart';
 
 class HomeWebViewScreen extends StatefulWidget {
   const HomeWebViewScreen({super.key});
@@ -35,8 +35,12 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
     super.dispose();
   }
 
+  // Initialize WebView with file picker support
   void initWebView() {
     controller.setJavaScriptMode(JavaScriptMode.unrestricted);
+    controller.setBackgroundColor(Colors.white);
+    controller.enableZoom(false);
+
     controller.setNavigationDelegate(
       NavigationDelegate(
         onPageStarted: (_) {
@@ -73,7 +77,91 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
         },
       ),
     );
+
+    // Setup file picker for Android
+    _setupFilePickerForAndroid();
+
+    // Setup file picker for iOS
+    _setupFilePickerForIOS();
+
     controller.loadRequest(Uri.parse(getCurrentUrl()));
+  }
+
+  // Setup file picker for Android
+  void _setupFilePickerForAndroid() {
+    if (controller.platform is AndroidWebViewController) {
+      final androidController = controller.platform as AndroidWebViewController;
+
+      // Enable debugging (optional)
+      AndroidWebViewController.enableDebugging(true);
+
+      // Setup file selector
+      androidController.setOnShowFileSelector((params) async {
+        print("📁 Android file picker opened");
+
+        try {
+          final result = await FilePicker.platform.pickFiles(
+            allowMultiple: params.acceptTypes.isEmpty ? false : params.isCaptureEnabled,
+            type: _getFileType(params.acceptTypes),
+          );
+
+          if (result == null || result.files.isEmpty) return [];
+
+          final file = result.files.single.path;
+          if (file == null) return [];
+
+          return [Uri.file(file).toString()];
+        } catch (e) {
+          print("❌ Android file picker error: $e");
+          return [];
+        }
+      });
+    }
+  }
+
+  // Setup file picker for iOS
+  void _setupFilePickerForIOS() {
+    if (controller.platform is WebKitWebViewController) {
+      print("🍎 iOS WebView - file picker will work natively");
+      // iOS handles file inputs automatically through WKWebView
+      // No additional setup needed
+    }
+  }
+
+  // Determine file type based on accept types
+  FileType _getFileType(List<String> acceptTypes) {
+    if (acceptTypes.isEmpty) {
+      return FileType.any;
+    }
+
+    final acceptType = acceptTypes.first.toLowerCase();
+
+    if (acceptType.contains('image')) {
+      return FileType.image;
+    } else if (acceptType.contains('video')) {
+      return FileType.video;
+    } else if (acceptType.contains('audio')) {
+      return FileType.audio;
+    } else if (acceptType.contains('pdf')) {
+      return FileType.custom;
+    } else {
+      return FileType.any;
+    }
+  }
+
+  // Inject JavaScript to enhance file input visibility
+  void _injectFileInputEnhancementScript() {
+    final script = """
+      console.log("Enhancing file inputs");
+      const inputs = document.querySelectorAll('input[type="file"]');
+      inputs.forEach(input => {
+        input.style.opacity = "1";
+        input.style.position = "relative";
+        input.style.zIndex = "9999";
+      });
+    """;
+
+    controller.runJavaScript(script);
   }
 
   @override
@@ -90,7 +178,6 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
       // Reactive switch listener — safe now
       ever(homeController.isSwitchOn, (val) {
         homeController.isLoadingPage.value = true;
-
         controller.loadRequest(Uri.parse(getCurrentUrl()));
       });
     });
@@ -114,106 +201,3 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
     );
   }
 }
-
-// class HomeWebViewScreen extends StatefulWidget {
-//   const HomeWebViewScreen({super.key});
-//
-//   @override
-//   State<HomeWebViewScreen> createState() => _HomeWebViewScreenState();
-// }
-//
-// class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
-//   WebViewController controller = WebViewController();
-//   final homeController = Get.put<HomeController>(HomeController());
-//   bool _isLoadingPage = true;
-//
-//   // String buildUrlWithQueryParams() {
-//   //   final Uri url = Uri(
-//   //       scheme: 'https',
-//   //       host: 'hrms.forgealumnus.com',
-//   //       path: '/employee/attendance',
-//   //       queryParameters: {
-//   //         'lat': '${ConstUtils.lat}',
-//   //         'lng': '${ConstUtils.long}',
-//   //       });
-//   //   return url.toString();
-//   // }
-//   String buildUrlWithQueryParams() {
-//     final Uri url = Uri(
-//       scheme: 'https',
-//       host: 'forgealumnus.com',
-//       path: 'WE-enable/mentor/login',
-//     );
-//     return url.toString();
-//   }
-//
-//   @override
-//   void initState() {
-//     super.initState();
-//     // url =
-//     //     'https://hrms.forgealumnus.com/employee/attendance?lat=${ConstUtils.lat}&lng=${ConstUtils.long}';
-//
-//     init();
-//   }
-//
-//   void init() {
-//     controller.setJavaScriptMode(JavaScriptMode.unrestricted);
-//     controller.setNavigationDelegate(
-//       NavigationDelegate(
-//         onUrlChange: (change) async {
-//           if (change.url?.contains(
-//                   "https://hrms.forgealumnus.com/employee/attendance") ==
-//               true) {
-//             final uri = Uri.parse(change.url!);
-//             if (!uri.queryParameters.containsKey("lat") ||
-//                 !uri.queryParameters.containsKey("lng")) {
-//               await controller
-//                   .loadRequest(Uri.parse(buildUrlWithQueryParams().toString()));
-//             }
-//           }
-//         },
-//         onPageFinished: (String url) {
-//           setState(() {
-//             _isLoadingPage = false;
-//           });
-//         },
-//       ),
-//     );
-//     controller.loadRequest(Uri.parse(buildUrlWithQueryParams().toString()));
-//
-//     // final platformController = controller.platform;
-//     // if (platformController is AndroidWebViewController) {
-//     //   platformController.setGeolocationPermissionsPromptCallbacks(
-//     //     onShowPrompt: (request) async {
-//     //       // request location permission
-//     //       final locationPermissionStatus =
-//     //           await Permission.locationWhenInUse.request();
-//     //
-//     //       // return the response
-//     //       return GeolocationPermissionsResponse(
-//     //         allow: locationPermissionStatus == PermissionStatus.granted,
-//     //         retain: false,
-//     //       );
-//     //     },
-//     //   );
-//     // }
-//   }
-//
-//   @override
-//   Widget build(BuildContext context) {
-//     return Material(
-//       color: AppColors.white,
-//       child: Stack(
-//         children: [
-//           WebViewWidget(controller: controller),
-//           // if (_isLoadingPage)
-//           //    Center(
-//           //     child: CircularProgressIndicator(
-//           //       color: AppColors.primary
-//           //     ),
-//           //   ),
-//         ],
-//       ),
-//     );
-//   }
-// }
