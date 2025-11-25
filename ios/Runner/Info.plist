@@ -33,6 +33,16 @@
 	</dict>
 	<key>NSAppleMusicUsageDescription</key>
 	<string>Forge Resources requires Access to Usage Description.</string>
+	<key>NSBonjourServices</key>
+	<array/>
+	<key>NSCameraUsageDescription</key>
+	<string>We need access to camera for profile image and share images in chat</string>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>This app needs local network access to discover devices on your network</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>we never use your microphone</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to photos for profile image and share images in chat</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

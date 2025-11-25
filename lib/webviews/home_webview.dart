@@ -9,7 +9,9 @@ import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
 import 'package:file_picker/file_picker.dart';
 
 class HomeWebViewScreen extends StatefulWidget {
-  const HomeWebViewScreen({super.key});
+  final String url;
+  final String weEnable;
+  const HomeWebViewScreen({super.key, required this.url, required this.weEnable});
 
   @override
   State<HomeWebViewScreen> createState() => _HomeWebViewScreenState();
@@ -21,12 +23,21 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
 
   String getCurrentUrl() {
     homeController.currentWebUrl.value = homeController.isSwitchOn.value
-        ? 'https://forgealumnus.com/WE-enable/login'
-        : 'https://forgealumnus.com/forge/login';
+        ? widget.weEnable
+        : widget.url;
     return homeController.isSwitchOn.value
-        ? 'https://forgealumnus.com/WE-enable/login'
-        : 'https://forgealumnus.com/forge/login';
+        ? widget.weEnable
+        : widget.url;
   }
+
+  // String getCurrentUrl() {
+  //   homeController.currentWebUrl.value = homeController.isSwitchOn.value
+  //       ? 'https://forgealumnus.com/WE-enable/login'
+  //       : 'https://forgealumnus.com/forge/login';
+  //   return homeController.isSwitchOn.value
+  //       ? 'https://forgealumnus.com/WE-enable/login'
+  //       : 'https://forgealumnus.com/forge/login';
+  // }
 
   @override
   void dispose() {
@@ -55,8 +66,8 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
 
             // ✅ Check if we are still on login URL
             bool isLoginUrl =
-                url == 'https://forgealumnus.com/WE-enable/login' ||
-                    url == 'https://forgealumnus.com/forge/login';
+                url == widget.weEnable ||
+                    url == widget.url;
             print('🧭 WebView landed on: $url');
             print('🔐 isLoginPage = $isLoginUrl');
 
@@ -68,8 +79,8 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
           final url = request.url;
           if (url != null) {
             bool isLoginUrl =
-                url == 'https://forgealumnus.com/WE-enable/login' ||
-                    url == 'https://forgealumnus.com/forge/login';
+                url == widget.weEnable ||
+                    url == widget.url;
 
             homeController.isLoginPage.value = isLoginUrl;
           }

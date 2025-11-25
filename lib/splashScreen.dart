@@ -34,7 +34,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
           if (isEnded) {
             Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => BottomNavigationBarScreen()),
+              MaterialPageRoute(builder: (_) => const BottomNavigationBarScreen()),
             );
           }
         });
@@ -64,7 +64,8 @@ class _SplashScreenState extends State<SplashScreen> {
                 ),
               ),
             )
-          : const Center(child: CircularProgressIndicator()),
+          : const SizedBox(),
+          // : const Center(child: CircularProgressIndicator()),
 
       // body: _controller.value.isInitialized
       //     ? /*SizedBox(

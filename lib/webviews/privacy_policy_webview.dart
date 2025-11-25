@@ -5,7 +5,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 class PrivacyPolicyWebViewScreen extends StatefulWidget {
-  const PrivacyPolicyWebViewScreen({super.key});
+  final String privacyUrl;
+  const PrivacyPolicyWebViewScreen({super.key, required this.privacyUrl});
 
   @override
   State<PrivacyPolicyWebViewScreen> createState() =>
@@ -31,7 +32,8 @@ class _PrivacyPolicyWebViewScreenState
           },
         ),
       )
-      ..loadRequest(Uri.parse("https://forgealumnus.com/privacy/policy"));
+      ..loadRequest(Uri.parse(widget.privacyUrl));
+      // ..loadRequest(Uri.parse("https://forgealumnus.com/privacy/policy"));
   }
 
   @override

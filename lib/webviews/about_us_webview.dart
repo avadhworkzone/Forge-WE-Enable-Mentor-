@@ -5,7 +5,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 class AboutUsWebViewScreen extends StatefulWidget {
-  const AboutUsWebViewScreen({super.key});
+  final String aboutUrl;
+  const   AboutUsWebViewScreen({super.key, required this.aboutUrl});
 
   @override
   State<AboutUsWebViewScreen> createState() => _AboutUsWebViewScreenState();
@@ -29,7 +30,8 @@ class _AboutUsWebViewScreenState extends State<AboutUsWebViewScreen> {
           },
         ),
       )
-      ..loadRequest(Uri.parse("https://forgealumnus.com/about-us"));
+      ..loadRequest(Uri.parse(widget.aboutUrl));
+      // ..loadRequest(Uri.parse("https://forgealumnus.com/about-us"));
   }
 
   @override

@@ -24,14 +24,25 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
   final RxInt currentBottomBarIndex = 4.obs;
   final homeController = Get.find<HomeController>();
 
-  // Replace static lists with dynamic lists from API
-  final RxList<String> bottomList = <String>[].obs;
-  final RxList<String> menuTitles = <String>[].obs;
-  final RxBool isLoadingMenu = false.obs;
+  // Store menu items from API
+  final RxList<Map<String, String>> menuItems = <Map<String, String>>[].obs;
+  final RxBool isLoadingMenu = true.obs;
+
+  // Store home data separately
+  final RxString homeIcon = "".obs;
+  final RxString homeTitle = "Home".obs;
+  final RxString homeUrl = "".obs;
+  final RxString homeWeenableUrl = "".obs;
+
+  // Flag to track if data is initialized
+  final RxBool isDataInitialized = false.obs;
 
   @override
   void initState() {
     super.initState();
+    // Set default values immediately
+    setDefaultMenuItems();
+    // Then fetch from API
     fetchMenuData();
   }
 
@@ -43,72 +54,82 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
       http.StreamedResponse response = await request.send();
 
       if (response.statusCode == 200) {
+        print("API call successful");
         final responseData = await response.stream.bytesToString();
         final jsonResponse = json.decode(responseData);
 
         if (jsonResponse['success'] == true) {
           final List<dynamic> menuData = jsonResponse['result']['menu'];
 
-          // Extract image URLs and titles from API response
-          List<String> imageUrls = [];
-          List<String> titles = [];
+          List<Map<String, String>> items = [];
 
           for (var item in menuData) {
-            String imageUrl = item['image'];
-            String title = item['title'];
+            String imageUrl = item['image'] ?? "";
+            String title = item['title'] ?? "";
+            String url = item['url'] ?? "";
 
-            // Extract filename from URL and map to local asset name
-            if (imageUrl.contains('aboutUs.png')) {
-              imageUrls.add("aboutUs.png");
-            } else if (imageUrl.contains('contactUs.png')) {
-              imageUrls.add("contactUs.png");
-            } else if (imageUrl.contains('termAndCondition.png')) {
-              imageUrls.add("termAndCondition.png");
-            } else if (imageUrl.contains('privacyPolicy.png')) {
-              imageUrls.add("privacyPolicy.png");
-            } else {
-              imageUrls.add("aboutUs.png"); // default fallback
+            // Store home data separately
+            if (title.toLowerCase() == "home") {
+              homeIcon.value = imageUrl;
+              homeTitle.value = title;
+              homeUrl.value = url;
+              homeWeenableUrl.value = item['weenable_url'] ?? "";
+              continue; // Skip adding home to bottom navigation list
             }
 
-            titles.add(title);
+            // Add to menu items with all data
+            items.add({
+              'image': imageUrl,
+              'title': title,
+              'url': url,
+            });
           }
 
-          bottomList.assignAll(imageUrls);
-          menuTitles.assignAll(titles);
+          menuItems.assignAll(items);
         } else {
           print('API returned error: ${jsonResponse['error']['message']}');
-          // Fallback to default list if API fails
-          setDefaultMenuItems();
         }
       } else {
         print('HTTP Error: ${response.reasonPhrase}');
-        // Fallback to default list if API fails
-        setDefaultMenuItems();
       }
     } catch (e) {
       print('Error fetching menu: $e');
-      // Fallback to default list if API fails
-      setDefaultMenuItems();
     } finally {
       isLoadingMenu.value = false;
+      isDataInitialized.value = true;
     }
   }
 
   void setDefaultMenuItems() {
-    // Set default menu items as fallback
-    bottomList.assignAll([
-      "aboutUs.png",
-      "contactUs.png",
-      "termAndCondition.png",
-      "privacyPolicy.png",
+    // Set default menu items as fallback - call this immediately in initState
+    menuItems.assignAll([
+      {
+        'image': 'https://forgealumnus.com/frontend/images/far/aboutUs.png',
+        'title': 'About Us',
+        'url': 'https://forgealumnus.com/about-us',
+      },
+      {
+        'image': 'https://forgealumnus.com/frontend/images/far/contactUs.png',
+        'title': 'Contact Us',
+        'url': 'https://forgealumnus.com/contact',
+      },
+      {
+        'image': 'https://forgealumnus.com/frontend/images/far/termAndCondition.png',
+        'title': 'Terms of use',
+        'url': 'https://forgealumnus.com/terms',
+      },
+      {
+        'image': 'https://forgealumnus.com/frontend/images/far/privacyPolicy.png',
+        'title': 'Privacy Policy',
+        'url': 'https://forgealumnus.com/privacy/policy',
+      },
     ]);
 
-    menuTitles.assignAll([
-      "About us",
-      "Contact us",
-      "Terms of Use",
-      "Privacy Policy",
-    ]);
+    // Set default home data
+    homeIcon.value = "https://forgealumnus.com/frontend/images/far/home.png";
+    homeTitle.value = "Home";
+    homeUrl.value = "https://forgealumnus.com/forge/login";
+    homeWeenableUrl.value = "https://forgealumnus.com/WE-enable/login";
   }
 
   String title(int index) {
@@ -118,11 +139,19 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
     }
 
     // For bottom navigation items (index 0-3)
-    if (index >= 0 && index < menuTitles.length) {
-      return menuTitles[index];
+    if (index >= 0 && index < menuItems.length) {
+      return menuItems[index]['title']!;
     }
 
     return "Forge"; // default fallback
+  }
+
+  // Helper method to get URL for specific index
+  String getUrlForIndex(int index) {
+    if (index >= 0 && index < menuItems.length) {
+      return menuItems[index]['url']!;
+    }
+    return "";
   }
 
   @override
@@ -130,15 +159,39 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
     final bool showFab = MediaQuery.of(context).viewInsets.bottom == 0.0;
 
     return Obx(() {
+      // Show loading indicator only if we don't have default data AND still loading
+      if (isLoadingMenu.value && menuItems.isEmpty) {
+        return Scaffold(
+          backgroundColor: AppColors.white,
+          body: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const CircularProgressIndicator(
+                  valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
+                ),
+                const SizedBox(height: 20),
+                Text(
+                  'Loading...',
+                  style: TextStyle(
+                    color: AppColors.primary,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
+
       final isHome = currentBottomBarIndex.value == 4;
       final isOnLoginPage = homeController.isLoginPage.value;
-      final showSwitch = isHome && isOnLoginPage;
+      final showSwitch = isHome || isOnLoginPage;
 
       // Calculate safe active index for bottom navigation
-      // When home is selected (index 4), show no active item in bottom nav
       final int safeActiveIndex = currentBottomBarIndex.value == 4
           ? -1 // No active item when home is selected
-          : currentBottomBarIndex.value.clamp(0, bottomList.length - 1);
+          : currentBottomBarIndex.value.clamp(0, menuItems.length - 1);
 
       return Scaffold(
         backgroundColor: AppColors.white,
@@ -169,9 +222,10 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
               : const SizedBox(),
           actions: [
             if (showSwitch)
-              Padding(
+              Obx(() => Padding(
                 padding: const EdgeInsets.only(right: 10),
                 child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const Text(
                       "Forge Alumnus",
@@ -179,6 +233,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
                         color: AppColors.primary,
                         fontSize: 13.0,
                         fontWeight: FontWeight.w700,
+                        fontFamily: "AGENCYB",
                       ),
                     ),
                     const SizedBox(height: 3),
@@ -209,7 +264,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
                     ),
                   ],
                 ),
-              ),
+              )),
           ],
         ),
         body: SafeArea(
@@ -217,17 +272,39 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
             builder: (_) {
               switch (currentBottomBarIndex.value) {
                 case 0:
-                  return const AboutUsWebViewScreen();
+                  return AboutUsWebViewScreen(
+                    aboutUrl: getUrlForIndex(0),
+                  );
                 case 1:
-                  return const ContactUsWebViewScreen();
+                  return ContactUsWebViewScreen(
+                    contactUsUrl: getUrlForIndex(1),
+                  );
                 case 2:
-                  return const TermAndConditionWebViewScreen();
+                  return TermAndConditionWebViewScreen(
+                    termsConditionUrl: getUrlForIndex(2),
+                  );
                 case 3:
-                  return const PrivacyPolicyWebViewScreen();
+                  return PrivacyPolicyWebViewScreen(
+                    privacyUrl: getUrlForIndex(3),
+                  );
                 case 4:
-                  return const HomeWebViewScreen();
+                  return HomeWebViewScreen(
+                    url: homeUrl.value.isNotEmpty
+                        ? homeUrl.value
+                        : "https://forgealumnus.com/forge/login",
+                    weEnable: homeWeenableUrl.value.isNotEmpty
+                        ? homeWeenableUrl.value
+                        : "https://forgealumnus.com/WE-enable/login",
+                  );
                 default:
-                  return const HomeWebViewScreen();
+                  return HomeWebViewScreen(
+                    url: homeUrl.value.isNotEmpty
+                        ? homeUrl.value
+                        : "https://forgealumnus.com/forge/login",
+                    weEnable: homeWeenableUrl.value.isNotEmpty
+                        ? homeWeenableUrl.value
+                        : "https://forgealumnus.com/WE-enable/login",
+                  );
               }
             },
           ),
@@ -240,35 +317,54 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
           child: CircleAvatar(
             radius: 30,
             backgroundColor: AppColors.primary,
-            child: Image.asset(
-              "assets/images/home.png",
-              width: 25,
-              height: 25,
-              color: currentBottomBarIndex.value == 4
-                  ? AppColors.yellow
-                  : AppColors.white,
-            ),
+            child: Obx(() {
+              String iconToUse = homeIcon.value.isNotEmpty
+                  ? homeIcon.value
+                  : "https://forgealumnus.com/frontend/images/far/home.png";
+
+              return Image.network(
+                iconToUse,
+                width: 25,
+                height: 25,
+                color: currentBottomBarIndex.value == 4
+                    ? AppColors.yellow
+                    : AppColors.white,
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset(
+                    "assets/images/home.png",
+                    width: 25,
+                    height: 25,
+                    color: currentBottomBarIndex.value == 4
+                        ? AppColors.yellow
+                        : AppColors.white,
+                  );
+                },
+              );
+            }),
           ),
         )
             : null,
         floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-        bottomNavigationBar: bottomList.isEmpty
-            ? _buildLoadingBottomNav() // Show loading state
-            : AnimatedBottomNavigationBar.builder(
-          itemCount: bottomList.length,
+        bottomNavigationBar: AnimatedBottomNavigationBar.builder(
+          itemCount: menuItems.length,
           tabBuilder: (int index, bool isActive) {
-            // When home is selected (currentBottomBarIndex == 4),
-            // all bottom nav items should be inactive
             final bool shouldBeActive = currentBottomBarIndex.value == index;
             final color = shouldBeActive ? AppColors.primary : AppColors.grey;
 
             return Padding(
               padding: const EdgeInsets.all(15),
-              child: Image.asset(
-                "assets/images/${bottomList[index]}",
+              child: Image.network(
+                menuItems[index]['image']!,
                 width: 10,
                 height: 10,
                 color: color,
+                errorBuilder: (context, error, stackTrace) {
+                  return Icon(
+                    Icons.error_outline,
+                    size: 10,
+                    color: color,
+                  );
+                },
               ),
             );
           },
@@ -282,20 +378,5 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
         ),
       );
     });
-  }
-
-  // Loading state for bottom navigation
-  Widget _buildLoadingBottomNav() {
-    return Container(
-      height: 60,
-      color: Colors.white,
-      child: const Center(
-        child: SizedBox(
-          width: 20,
-          height: 20,
-          child: CircularProgressIndicator(strokeWidth: 2),
-        ),
-      ),
-    );
   }
 }

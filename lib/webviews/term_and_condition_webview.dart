@@ -5,7 +5,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:webview_flutter_android/webview_flutter_android.dart';
 
 class TermAndConditionWebViewScreen extends StatefulWidget {
-  const TermAndConditionWebViewScreen({super.key});
+  final String termsConditionUrl;
+  const TermAndConditionWebViewScreen({super.key, required this.termsConditionUrl});
 
   @override
   State<TermAndConditionWebViewScreen> createState() =>
@@ -31,7 +32,8 @@ class _TermAndConditionWebViewScreenState
           },
         ),
       )
-      ..loadRequest(Uri.parse("https://forgealumnus.com/terms"));
+      ..loadRequest(Uri.parse(widget.termsConditionUrl));
+      // ..loadRequest(Uri.parse("https://forgealumnus.com/terms"));
   }
 
   @override
