@@ -50,7 +50,7 @@ android {
         applicationId "com.forgealumnus.app.forge_we_enable_mentor"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion 21
+        minSdkVersion flutter.minSdkVersion
         targetSdkVersion 35
 //        targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
