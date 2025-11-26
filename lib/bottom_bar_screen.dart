@@ -37,6 +37,7 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
   // Flag to track if data is initialized
   final RxBool isDataInitialized = false.obs;
 
+
   @override
   void initState() {
     super.initState();
@@ -186,7 +187,8 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
 
       final isHome = currentBottomBarIndex.value == 4;
       final isOnLoginPage = homeController.isLoginPage.value;
-      final showSwitch = isHome || isOnLoginPage;
+      final isUserLoggedIn = homeController.isUserLoggedIn.value;
+      final showSwitch = (isHome || isOnLoginPage) && !isUserLoggedIn;
 
       // Calculate safe active index for bottom navigation
       final int safeActiveIndex = currentBottomBarIndex.value == 4

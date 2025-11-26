@@ -6,6 +6,7 @@ class HomeController extends GetxController {
   RxBool isLoadingPage = true.obs;
   final RxString currentWebUrl = ''.obs;
   final RxBool isLoginPage = true.obs;
+  final RxBool isUserLoggedIn = false.obs; // નવું ઍડ કરો
 
   @override
   void onInit() {
@@ -18,5 +19,10 @@ class HomeController extends GetxController {
         SecureStorageUtils.isProgramSwitchOnKey);
     print("---isProgramSwitchOnKey----$savedVal");
     isSwitchOn.value = savedVal;
+  }
+
+  // નવી મેથડ ઍડ કરો - લૉગિન સ્ટેટ સેટ કરવા માટે
+  void setUserLoggedIn(bool loggedIn) {
+    isUserLoggedIn.value = loggedIn;
   }
 }

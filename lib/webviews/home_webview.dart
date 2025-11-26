@@ -30,15 +30,6 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
         : widget.url;
   }
 
-  // String getCurrentUrl() {
-  //   homeController.currentWebUrl.value = homeController.isSwitchOn.value
-  //       ? 'https://forgealumnus.com/WE-enable/login'
-  //       : 'https://forgealumnus.com/forge/login';
-  //   return homeController.isSwitchOn.value
-  //       ? 'https://forgealumnus.com/WE-enable/login'
-  //       : 'https://forgealumnus.com/forge/login';
-  // }
-
   @override
   void dispose() {
     controller.clearCache();
@@ -46,7 +37,26 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
     super.dispose();
   }
 
-  // Initialize WebView with file picker support
+  // URL ચેક કરવા માટે નવી મેથડ
+  bool _isLoginUrl(String url) {
+    return url == widget.weEnable || url == widget.url;
+  }
+
+  // લૉગિન ડિટેક્ટ કરવા માટે નવી મેથડ
+  bool _isDashboardUrl(String url) {
+    // તમારા ઍપ્લિકેશનના ડૅશબોર્ડ URL અહીં ઍડ કરો
+    List<String> dashboardUrls = [
+      'https://forgealumnus.com/forge/dashboard',
+      'https://forgealumnus.com/WE-enable/dashboard',
+      '/dashboard',
+      '/home',
+      '/profile'
+    ];
+
+    return dashboardUrls.any((dashboardUrl) =>
+    url.contains(dashboardUrl) || url.endsWith(dashboardUrl));
+  }
+
   void initWebView() {
     controller.setJavaScriptMode(JavaScriptMode.unrestricted);
     controller.setBackgroundColor(Colors.white);
@@ -55,7 +65,6 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
     controller.setNavigationDelegate(
       NavigationDelegate(
         onPageStarted: (_) {
-          // Start loading
           homeController.isLoadingPage.value = true;
         },
         onPageFinished: (url) {
@@ -64,24 +73,29 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
           if (url != null) {
             homeController.currentWebUrl.value = url;
 
-            // ✅ Check if we are still on login URL
-            bool isLoginUrl =
-                url == widget.weEnable ||
-                    url == widget.url;
+            // ✅ લૉગિન URL ચેક કરો
+            bool isLoginUrl = _isLoginUrl(url);
             print('🧭 WebView landed on: $url');
             print('🔐 isLoginPage = $isLoginUrl');
 
             homeController.isLoginPage.value = isLoginUrl;
+
+            // ✅ લૉગિન સ્ટેટ ચેક કરો
+            if (_isDashboardUrl(url)) {
+              // જો ડૅશબોર્ડ પર છે તો લૉગિન થઈ ગયો છે
+              homeController.setUserLoggedIn(true);
+              print('✅ User is logged in - Dashboard detected');
+            } else if (isLoginUrl) {
+              // જો લૉગિન પેજ પર છે તો લૉગઆઉટ થયો છે
+              homeController.setUserLoggedIn(false);
+              print('❌ User is logged out - Login page detected');
+            }
           }
         },
         onNavigationRequest: (request) {
-          // Optional: Update early before page load finishes
           final url = request.url;
           if (url != null) {
-            bool isLoginUrl =
-                url == widget.weEnable ||
-                    url == widget.url;
-
+            bool isLoginUrl = _isLoginUrl(url);
             homeController.isLoginPage.value = isLoginUrl;
           }
           return NavigationDecision.navigate;
@@ -89,27 +103,19 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
       ),
     );
 
-    // Setup file picker for Android
     _setupFilePickerForAndroid();
-
-    // Setup file picker for iOS
     _setupFilePickerForIOS();
-
     controller.loadRequest(Uri.parse(getCurrentUrl()));
   }
 
-  // Setup file picker for Android
+  // બાકીનો file picker કોડ સમાન રહેશે...
   void _setupFilePickerForAndroid() {
     if (controller.platform is AndroidWebViewController) {
       final androidController = controller.platform as AndroidWebViewController;
-
-      // Enable debugging (optional)
       AndroidWebViewController.enableDebugging(true);
 
-      // Setup file selector
       androidController.setOnShowFileSelector((params) async {
         print("📁 Android file picker opened");
-
         try {
           final result = await FilePicker.platform.pickFiles(
             allowMultiple: params.acceptTypes.isEmpty ? false : params.isCaptureEnabled,
@@ -117,10 +123,8 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
           );
 
           if (result == null || result.files.isEmpty) return [];
-
           final file = result.files.single.path;
           if (file == null) return [];
-
           return [Uri.file(file).toString()];
         } catch (e) {
           print("❌ Android file picker error: $e");
@@ -130,23 +134,17 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
     }
   }
 
-  // Setup file picker for iOS
   void _setupFilePickerForIOS() {
     if (controller.platform is WebKitWebViewController) {
       print("🍎 iOS WebView - file picker will work natively");
-      // iOS handles file inputs automatically through WKWebView
-      // No additional setup needed
     }
   }
 
-  // Determine file type based on accept types
   FileType _getFileType(List<String> acceptTypes) {
     if (acceptTypes.isEmpty) {
       return FileType.any;
     }
-
     final acceptType = acceptTypes.first.toLowerCase();
-
     if (acceptType.contains('image')) {
       return FileType.image;
     } else if (acceptType.contains('video')) {
@@ -160,33 +158,17 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
     }
   }
 
-  // Inject JavaScript to enhance file input visibility
-  void _injectFileInputEnhancementScript() {
-    final script = """
-      console.log("Enhancing file inputs");
-      const inputs = document.querySelectorAll('input[type="file"]');
-      inputs.forEach(input => {
-        input.style.opacity = "1";
-        input.style.position = "relative";
-        input.style.zIndex = "9999";
-      });
-    """;
-
-    controller.runJavaScript(script);
-  }
-
   @override
   void initState() {
     super.initState();
     homeController.loadSwitchState();
 
-    // Ensure post-frame to avoid setState errors
     WidgetsBinding.instance.addPostFrameCallback((_) {
       homeController.isLoginPage.value = true;
+      homeController.setUserLoggedIn(false); // શરૂઆતમાં લૉગઆઉટ સ્ટેટ
       print("--Init---${homeController.isLoginPage.value}");
       initWebView();
 
-      // Reactive switch listener — safe now
       ever(homeController.isSwitchOn, (val) {
         homeController.isLoadingPage.value = true;
         controller.loadRequest(Uri.parse(getCurrentUrl()));
