@@ -1,4 +1,4 @@
-package com.forgealumnus.app.forge_we_enable_mentor
+package com.forgeresources.app
 
 import io.flutter.embedding.android.FlutterActivity
 
