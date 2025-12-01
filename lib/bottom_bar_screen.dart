@@ -239,12 +239,38 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
                       ),
                     ),
                     const SizedBox(height: 3),
+                    // FlutterSwitch(
+                    //   width: 60.0,
+                    //   height: 28.0,
+                    //   valueFontSize: 12.0,
+                    //   toggleSize: 20.0,
+                    //   value: homeController.isSwitchOn.value,
+                    //   borderRadius: 30.0,
+                    //   padding: 5.0,
+                    //   activeText: "ON",
+                    //   inactiveText: "OFF",
+                    //   showOnOff: true,
+                    //   activeColor: AppColors.primary,
+                    //   inactiveTextColor: AppColors.black,
+                    //   inactiveColor: Colors.grey.shade300,
+                    //   activeTextColor: Colors.white,
+                    //   onToggle: (val) async {
+                    //     homeController.isSwitchOn.value = val;
+                    //     homeController.isLoadingPage.value = true;
+                    //     await SecureStorageUtils.setBool(
+                    //       SecureStorageUtils.isProgramSwitchOnKey,
+                    //       val,
+                    //     );
+                    //     print("Switch changed to: ${val ? 'WE-Enable' : 'Forge'}");
+                    //     print("----homeController.isSwitchOn.value----${homeController.isSwitchOn.value}");
+                    //   },
+                    // ),
                     FlutterSwitch(
                       width: 60.0,
                       height: 28.0,
                       valueFontSize: 12.0,
                       toggleSize: 20.0,
-                      value: homeController.isSwitchOn.value,
+                      value: !homeController.isSwitchOn.value, // 🔥 INVERSE THE VALUE FOR DISPLAY
                       borderRadius: 30.0,
                       padding: 5.0,
                       activeText: "ON",
@@ -255,11 +281,12 @@ class _BottomNavigationBarScreenState extends State<BottomNavigationBarScreen> {
                       inactiveColor: Colors.grey.shade300,
                       activeTextColor: Colors.white,
                       onToggle: (val) async {
-                        homeController.isSwitchOn.value = val;
+                        // 🔥 ACTUAL LOGIC REMAINS SAME, ONLY DISPLAY IS INVERTED
+                        homeController.isSwitchOn.value = !val;
                         homeController.isLoadingPage.value = true;
                         await SecureStorageUtils.setBool(
                           SecureStorageUtils.isProgramSwitchOnKey,
-                          val,
+                          !val, // 🔥 STORE THE INVERSE VALUE
                         );
                         print("----homeController.isSwitchOn.value----${homeController.isSwitchOn.value}");
                       },

@@ -20,6 +20,7 @@ class HomeWebViewScreen extends StatefulWidget {
 class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
   final WebViewController controller = WebViewController();
   final homeController = Get.find<HomeController>();
+  bool _isDisposed = false; // Add this flag
 
   String getCurrentUrl() {
     homeController.currentWebUrl.value = homeController.isSwitchOn.value
@@ -32,8 +33,16 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
 
   @override
   void dispose() {
-    controller.clearCache();
-    homeController.isLoginPage.value = true;
+    _isDisposed = true; // Set flag first
+
+    // Clear cache but don't update any controllers
+    controller.clearCache().then((_) {
+      // Only update controller if not disposed
+      if (!_isDisposed) {
+        homeController.isLoginPage.value = true;
+      }
+    });
+
     super.dispose();
   }
 
@@ -65,38 +74,44 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
     controller.setNavigationDelegate(
       NavigationDelegate(
         onPageStarted: (_) {
-          homeController.isLoadingPage.value = true;
+          if (!_isDisposed) {
+            homeController.isLoadingPage.value = true;
+          }
         },
         onPageFinished: (url) {
-          homeController.isLoadingPage.value = false;
+          if (!_isDisposed) {
+            homeController.isLoadingPage.value = false;
 
-          if (url != null) {
-            homeController.currentWebUrl.value = url;
+            if (url != null) {
+              homeController.currentWebUrl.value = url;
 
-            // ✅ લૉગિન URL ચેક કરો
-            bool isLoginUrl = _isLoginUrl(url);
-            print('🧭 WebView landed on: $url');
-            print('🔐 isLoginPage = $isLoginUrl');
+              // ✅ લૉગિન URL ચેક કરો
+              bool isLoginUrl = _isLoginUrl(url);
+              print('🧭 WebView landed on: $url');
+              print('🔐 isLoginPage = $isLoginUrl');
 
-            homeController.isLoginPage.value = isLoginUrl;
+              homeController.isLoginPage.value = isLoginUrl;
 
-            // ✅ લૉગિન સ્ટેટ ચેક કરો
-            if (_isDashboardUrl(url)) {
-              // જો ડૅશબોર્ડ પર છે તો લૉગિન થઈ ગયો છે
-              homeController.setUserLoggedIn(true);
-              print('✅ User is logged in - Dashboard detected');
-            } else if (isLoginUrl) {
-              // જો લૉગિન પેજ પર છે તો લૉગઆઉટ થયો છે
-              homeController.setUserLoggedIn(false);
-              print('❌ User is logged out - Login page detected');
+              // ✅ લૉગિન સ્ટેટ ચેક કરો
+              if (_isDashboardUrl(url)) {
+                // જો ડૅશબોર્ડ પર છે તો લૉગિન થઈ ગયો છે
+                homeController.setUserLoggedIn(true);
+                print('✅ User is logged in - Dashboard detected');
+              } else if (isLoginUrl) {
+                // જો લૉગિન પેજ પર છે તો લૉગઆઉટ થયો છે
+                homeController.setUserLoggedIn(false);
+                print('❌ User is logged out - Login page detected');
+              }
             }
           }
         },
         onNavigationRequest: (request) {
-          final url = request.url;
-          if (url != null) {
-            bool isLoginUrl = _isLoginUrl(url);
-            homeController.isLoginPage.value = isLoginUrl;
+          if (!_isDisposed) {
+            final url = request.url;
+            if (url != null) {
+              bool isLoginUrl = _isLoginUrl(url);
+              homeController.isLoginPage.value = isLoginUrl;
+            }
           }
           return NavigationDecision.navigate;
         },
@@ -164,15 +179,19 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
     homeController.loadSwitchState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      homeController.isLoginPage.value = true;
-      homeController.setUserLoggedIn(false); // શરૂઆતમાં લૉગઆઉટ સ્ટેટ
-      print("--Init---${homeController.isLoginPage.value}");
-      initWebView();
+      if (!_isDisposed) {
+        homeController.isLoginPage.value = true;
+        homeController.setUserLoggedIn(false); // શરૂઆતમાં લૉગઆઉટ સ્ટેટ
+        print("--Init---${homeController.isLoginPage.value}");
+        initWebView();
 
-      ever(homeController.isSwitchOn, (val) {
-        homeController.isLoadingPage.value = true;
-        controller.loadRequest(Uri.parse(getCurrentUrl()));
-      });
+        ever(homeController.isSwitchOn, (val) {
+          if (!_isDisposed) {
+            homeController.isLoadingPage.value = true;
+            controller.loadRequest(Uri.parse(getCurrentUrl()));
+          }
+        });
+      }
     });
   }
 
@@ -184,7 +203,7 @@ class _HomeWebViewScreenState extends State<HomeWebViewScreen> {
         return Stack(
           children: [
             WebViewWidget(controller: controller),
-            if (homeController.isLoadingPage.value)
+            if (homeController.isLoadingPage.value && !_isDisposed)
               const Center(
                 child: CircularProgressIndicator(color: AppColors.primary),
               ),
